@@ -132,7 +132,10 @@ void Animation::generateBuffers(){
 	glGenBuffers(1, &s_EBO);
 	glGenVertexArrays(1, &b_VAO);
 	glGenBuffers(1, &b_VBO);
-	glGenBuffers(1, &b_EBO);
+	glGenBuffers(1, &b_EBO);	
+	glGenVertexArrays(1, &f_VAO);
+	glGenBuffers(1, &f_VBO);
+	glGenBuffers(1, &f_EBO);
 
 	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray(s_VAO);
@@ -164,6 +167,21 @@ void Animation::generateBuffers(){
 	glBindVertexArray(0);
 	
 	
+	glBindVertexArray(f_VAO);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, f_EBO);
+	
+	
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Unbind VAO
+	glBindVertexArray(0);
+	
+	
 
 	
 	
@@ -178,8 +196,7 @@ void Animation::generateShapes(){
 	glBindVertexArray(s_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
 	
-	polygon = Polygon(7.5);
-	//bound = Circle(9.1);
+	polygon = Polygon(radius, sides);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Unbind
 	glBindVertexArray(0);
@@ -187,9 +204,16 @@ void Animation::generateShapes(){
 	
 	glBindVertexArray(b_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
+	circle = Circle(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Unbind
+	glBindVertexArray(0);
 	
-	bound = Circle(9.1);
-	//bound = Circle(9.1);
+
+	
+	glBindVertexArray(f_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
+	force = Forcevec(radius);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Unbind
 	glBindVertexArray(0);
@@ -205,7 +229,7 @@ void Animation::setProjectionMatrices(){
 	glm::mat4 projection;
 	
 	//View is at z = +8
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -50.0f));
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -30.0f));
 //	view = glm::rotate(view, (float) -(M_PI/8.0), glm::vec3(0.0f, 1.0f, 0.0f));
 	//Projection has 45 degree FoV, aspect ratio given by the window's, and
 	//records only those objects within 0.1f and 100.0f of the "camera"
@@ -220,7 +244,7 @@ void Animation::setProjectionMatrices(){
 	//when Sphere::draw is called.
 	Circle::modelLoc = modelLoc;
 	Polygon::modelLoc = modelLoc;
-	
+	Forcevec::modelLoc = modelLoc;
 	// Set the uniforms of the other matrices now - they won't change.
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -261,34 +285,58 @@ void Animation::draw(){
 
 void Animation::drawShapes(){
 	
-	
-	glBindVertexArray(b_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
 	lock.lock();
-	glUniform4f(colorLoc, 0.8f, 0.8f, 0.8f, 1.0f);
-	bound.draw(boundpos[0], boundpos[1], 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 	
+
+
+	if(drawForceVec){
+		glBindVertexArray(f_VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
+		glUniform4f(colorLoc, 0.95f, 0.05f, 0.75f, 1.0f);
+		force.draw(boundpos[0], boundpos[1], forceVecAng);
 	
-	
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+	}
+
+
 	glBindVertexArray(s_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
-	glUniform4f(colorLoc, 0.75f, 0.5f, 0.25f, 1.0f);
-	polygon.draw(polypos[0], polypos[1], 0.01, polyang);
+	glUniform4f(colorLoc, 0.35f, 0.5f, 0.75f, 1.0f);
+	polygon.draw(polypos[0], polypos[1], 0, polyang);
 	
-	lock.unlock();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	
+
+	glBindVertexArray(b_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
+	glUniform4f(colorLoc, 0.8f, 0.8f, 0.8f, 1.0f);
+	circle.draw(boundpos[0], boundpos[1],0, 8.6);
+
+	circle.draw(boundpos[0], boundpos[1],0.1, 0.25);
+	glUniform4f(colorLoc, 0.2f, 0.8f, 0.3f, 1.0f);
+	//center circle
+	circle.draw(polypos[0], polypos[1], 0.1, 0.25);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	
+
+	
+	lock.unlock();
 	
 }
 
 
 
-void Animation::setDisks(double* pp, double* pv, double pa, double pav, double* b, double* v){
+void Animation::setPoly(double* pp, double* pv, double pa, 
+						double pav, double* b, double* v, double* v_pos){
 	lock.lock();
 	polyang = pa;
+	double dif = pav - polyangvel;
 	polyangvel = pav;
+
 	for(int i=0; i<2; i++){
 		polypos[i] = pp[i];
 		polyvel[i] = pv[i];
@@ -296,22 +344,36 @@ void Animation::setDisks(double* pp, double* pv, double pa, double pav, double* 
 		boundvel[i] = v[i];
 	}
 	lock.unlock();
-	
+	if(v_pos){
+
+		if(dif>0){
+			std::cout<<"Positive"<<std::endl;
+		}else{
+			std::cout<<"Negative"<<std::endl;
+		}
+		forceVecAng = atan2(v_pos[1],v_pos[0]);
+		drawForceVec = true;
+		sleep(2);
+		drawForceVec = false;
+	}
 }
 
-void Animation::moveDisks(double time){
+void Animation::movePoly(double time){
 	double start = 0;
 	while(start<time){
 		lock.lock();
 		for(int j=0; j<2; j++){
-			polypos[j] += DELTA_T*polyvel[j];
+			polypos[j] += delta_t*polyvel[j];
 		}
-		polyang += DELTA_T*polyangvel;
-		for(int j=0; j<2; j++) boundpos[j] += DELTA_T*boundvel[j];
+		polyang += delta_t*polyangvel;
+		for(int j=0; j<2; j++) boundpos[j] += delta_t*boundvel[j];
 		lock.unlock();
-		start+= DELTA_T;
+		start+= delta_t;
 	}
 	
+	
+
+
 }
 
 

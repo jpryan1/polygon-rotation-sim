@@ -1,5 +1,5 @@
-#ifndef  _CIRCLE_H_    /* only process this file once */
-#define  _CIRCLE_H_
+#ifndef  _FORCEVEC_H_    /* only process this file once */
+#define  _FORCEVEC_H_
 #define GLM_FORCE_RADIANS 1
 #include <iostream>
 #include <vector>
@@ -12,7 +12,7 @@
 
 
 
-class Circle{
+class Forcevec{
 	
 public:
 	std::vector<GLfloat> vertices;
@@ -21,10 +21,9 @@ public:
 	
 
 	static GLuint modelLoc;
-	Circle(){}
-	Circle(double r);
-	
-	void draw(GLfloat a, GLfloat b, GLfloat c, double radius);//, GLfloat c);
+	Forcevec(){}
+	Forcevec(double r);
+	void draw( double a, double b, float ang);
 private:
 	double radius;
 };

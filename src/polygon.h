@@ -10,8 +10,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#define PI 3.14159265359
-#define SIDES 15
 
 class Polygon{
 	
@@ -23,7 +21,7 @@ public:
 
 	static GLuint modelLoc;
 	Polygon(){}
-	Polygon(double r);
+	Polygon(double r, int sides);
 	void draw(GLfloat a, GLfloat b, GLfloat c, float ang);
 private:
 	double radius;

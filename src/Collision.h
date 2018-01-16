@@ -17,7 +17,7 @@ class Collision{
 		double getTime();
 		Type getType();
 	
-	
+		int hit_vertex;
 	private:
 		Type type;
 		double time;
