@@ -96,7 +96,7 @@ double Poly::newton_fd(double t, int a){
 
 
 
-
+ 
 
 
 void Poly::checkSwirlCollision( std::vector<Collision>& currentCollisions ){

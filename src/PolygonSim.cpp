@@ -123,9 +123,10 @@ void simulation(int sides, double radius, double coef, int max_iterations, int s
 		poly.nextCollisions(currentCollisions);
 		poly.updatePositions(currentCollisions[0].getTime());
 		total_time +=currentCollisions[0].getTime();
+		std::cout<<poly.getAngVel()<<std::endl;
+		
 		if(iterations>300000){
 			total_ang_vel += poly.getAngVel();
-				
 			if(currentCollisions[0].getType() != SWIRL){
 				int current_hit_vert = currentCollisions[0].hit_vertex;
 				int lower = std::min(last_hit_vert, current_hit_vert);
@@ -141,6 +142,7 @@ void simulation(int sides, double radius, double coef, int max_iterations, int s
 		for(int i=0; i<currentCollisions.size(); i++){
 			poly.processCollision(currentCollisions[i]);
 		}
+		//if(iterations<300000) continue;
 		if(currentCollisions[0].getType() == SWIRL){
 			poly.updateAnimation(currentCollisions[0].getTime(), -1);
 		}

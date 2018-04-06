@@ -11,14 +11,14 @@ void Poly::initialize(){
 	
 	this->boundpos[0] = 0;
 	this->boundpos[1] = 0;
-	this->boundvel[0] = 0.5;//0.5;//0.5; //CONSTANT HERE
+	this->boundvel[0] = 0.75;
 	this->boundvel[1] = 0;
 	this->swirl_time=0;
 	for(int i=0; i<2; i++){
 		centerpos[i] = 0;
 		centervel[i] = 1;
 	}
-	centerpos[0]+=0.24252312323;
+	centerpos[0]+=0.00052312323;
 	
 	this->ang = 0;
 	this->angvel = 0;

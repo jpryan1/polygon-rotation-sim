@@ -347,9 +347,9 @@ void Animation::setPoly(double* pp, double* pv, double pa,
 	if(v_pos){
 
 		if(dif>0){
-			std::cout<<"Positive"<<std::endl;
+			//std::cout<<"Change in angvel is Positive"<<std::endl;
 		}else{
-			std::cout<<"Negative"<<std::endl;
+			//std::cout<<"Change in angvel is Negative"<<std::endl;
 		}
 		forceVecAng = atan2(v_pos[1],v_pos[0]);
 		drawForceVec = true;
