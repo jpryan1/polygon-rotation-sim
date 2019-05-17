@@ -1,9 +1,6 @@
-
 #include "animation.h"
 
 std::mutex lock;
-
-
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
@@ -30,6 +27,18 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 "	color = ourColor;\n"
 "}\n\0";
 
+Animation::Animation( double d, double r, int s){
+	notReady = true;
+	drawing = false;
+	drawForceVec = false;
+	boundpos[0] = 0;
+	boundpos[1] = 0;
+	delta_t = d;
+	radius = r;
+	sides = s;
+}
+
+		
 void Animation::initialize(){
 	//Initialize GLFW
 	if (!glfwInit())
@@ -65,6 +74,7 @@ void Animation::initialize(){
 	glEnable(GL_DEPTH_TEST);
 	
 }
+
 
 //The following function can be simplified with the introduction of a shader.cpp file
 void Animation::compileShaders(){
@@ -113,7 +123,6 @@ void Animation::compileShaders(){
 }
 
 
-
 void Animation::setup(){
 	initialize();
 	compileShaders();
@@ -121,6 +130,7 @@ void Animation::setup(){
 	generateShapes();
 	setProjectionMatrices();
 }
+
 
 void Animation::generateBuffers(){
 	//	We use three buffers.
@@ -143,7 +153,6 @@ void Animation::generateBuffers(){
 	glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s_EBO);
 	
-
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -157,7 +166,6 @@ void Animation::generateBuffers(){
 	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b_EBO);
 	
-	
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -165,14 +173,12 @@ void Animation::generateBuffers(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Unbind VAO
 	glBindVertexArray(0);
-	
 	
 	glBindVertexArray(f_VAO);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, f_EBO);
 	
-	
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -180,16 +186,8 @@ void Animation::generateBuffers(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Unbind VAO
 	glBindVertexArray(0);
-	
-	
-
-	
-	
-	
-	
-	
-
 }
+
 
 void Animation::generateShapes(){
 	//Bind VAO so sphere data can be transferred to VBO buffers on construction
@@ -201,7 +199,6 @@ void Animation::generateShapes(){
 	//Unbind
 	glBindVertexArray(0);
 	
-	
 	glBindVertexArray(b_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
 	circle = Circle(1);
@@ -209,16 +206,14 @@ void Animation::generateShapes(){
 	//Unbind
 	glBindVertexArray(0);
 	
-
-	
 	glBindVertexArray(f_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
 	force = Forcevec(radius);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Unbind
 	glBindVertexArray(0);
-	
 }
+
 
 void Animation::setProjectionMatrices(){
 	//This function creates 4x4 transformation matrices which are then passed to uniforms.
@@ -251,12 +246,12 @@ void Animation::setProjectionMatrices(){
 	
 }
 
+
 void Animation::draw(){
 	//This loop runs until the window is closed. When this happens, this function reaches the last line, which results in the
 	//entire program ending
 	while(notReady);
-	
-	
+
 	while (!glfwWindowShouldClose(window) )
 	{
 		/* Poll for and process events */
@@ -282,13 +277,10 @@ void Animation::draw(){
 }
 
 
-
 void Animation::drawShapes(){
 	
 	lock.lock();
 	
-
-
 	if(drawForceVec){
 		glBindVertexArray(f_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, f_VBO);
@@ -297,9 +289,7 @@ void Animation::drawShapes(){
 	
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
-
 	}
-
 
 	glBindVertexArray(s_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
@@ -309,7 +299,6 @@ void Animation::drawShapes(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
-
 	glBindVertexArray(b_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
 	glUniform4f(colorLoc, 0.8f, 0.8f, 0.8f, 1.0f);
@@ -322,12 +311,9 @@ void Animation::drawShapes(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
-
-	
 	lock.unlock();
 	
 }
-
 
 
 void Animation::setPoly(double* pp, double* pv, double pa,
@@ -358,6 +344,7 @@ void Animation::setPoly(double* pp, double* pv, double pa,
 	}
 }
 
+
 void Animation::movePoly(double time){
 	double start = 0;
 	while(start<time){
@@ -370,18 +357,4 @@ void Animation::movePoly(double time){
 		lock.unlock();
 		start+= delta_t;
 	}
-	
-	
-
-
 }
-
-
-
-
-
-
-
-
-
-

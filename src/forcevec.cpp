@@ -12,7 +12,6 @@ Forcevec::Forcevec(double radius){
 	vertices.push_back(-0.05);
 	vertices.push_back(0);
 	
-
 	vertices.push_back(8.6);
 	vertices.push_back(-0.05);
 	vertices.push_back(0);

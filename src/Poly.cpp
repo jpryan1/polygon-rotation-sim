@@ -4,9 +4,21 @@ double Poly::swirl_interval = 0.025;
 double Poly::boundrad = 8.6;
 double Poly::swirl_angle = 3.14159265359 / 240;
 
-
 Animation* Poly::animation;
 
+
+Poly::Poly(int s, double r, double c){
+	sides = s;
+	radius = r;
+	coef = c;
+
+	showForceVec = 0;
+ 	mass = (0.5) * sides * radius * radius * sin(2*M_PI/sides);
+	moment_of_inertia =
+		 (0.5) * mass * radius * radius *(1 - (2.0 / 3.0) * pow(sin( M_PI / sides), 2));
+}
+		
+		
 void Poly::initialize(){
 	
 	this->boundpos[0] = 0;
@@ -18,32 +30,32 @@ void Poly::initialize(){
 		centerpos[i] = 0;
 		centervel[i] = 0.6;
 	}
-// 	centerpos[0]+=0.00052312323;
-	
+
 	this->ang = 0;
 	this->angvel = 0.0;
 	
-	
-	
 	if(animation){
-		animation->setPoly(centerpos, centervel, ang, angvel, boundpos, boundvel,NULL);
+		animation->setPoly(centerpos, centervel, ang, angvel, boundpos, boundvel, NULL);
 		animation->notReady = false;
 	}
-	
-	
 }
+
+
 vec Poly::vert_pos(int a){
 	return vec(centerpos).add(vec(cos(ang+a*(M_PI/(sides/2.0))),sin(ang+a*(M_PI/(sides/2.0)))).times(radius));
 }
+
 
 double Poly::getAngVel(){
 	return angvel;
 }
 
+
 double Poly::getEnergyInLabFrame(){
   return moment_of_inertia * pow(angvel,2)
     + mass*(pow(centervel[0],2) + pow(centervel[1],2));
 }
+
 
 double Poly::getEnergyInMFrame(){
   // So, the boundary traj starts at 0,0, has side length swirl_interval, and
@@ -57,17 +69,15 @@ double Poly::getEnergyInMFrame(){
   double rx = centerpos[0] - traj_cx;
   double ry = centerpos[1] - traj_cy;
   
-  
   double period = swirl_interval*n;
   double omega = 2*M_PI/period;
   double crossx = -omega*ry;
   double crossy = omega*rx;
   
-  
-  
-  return moment_of_inertia *pow(angvel-omega,2);
+  return moment_of_inertia * pow(angvel-omega,2);
     +mass*(pow(centervel[0] - crossx, 2)+pow(centervel[1] - crossy,2));
 }
+
 
 double Poly::getEnergyInBFrame(){
   return moment_of_inertia * pow(angvel,2)

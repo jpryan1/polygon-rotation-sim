@@ -3,8 +3,6 @@
 GLuint Polygon::modelLoc;
 
 Polygon::Polygon(double radius, int sides){
-	
-	
 	for(int i=0; i<3; i++) vertices.push_back(0);
 	
 	for(int i=0; i<sides; i++){
@@ -23,7 +21,6 @@ Polygon::Polygon(double radius, int sides){
 	indices.push_back(1);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLushort), &indices[0], GL_STATIC_DRAW);
-
 }
 
 
@@ -36,11 +33,3 @@ void Polygon::draw(GLfloat a, GLfloat b, GLfloat c, float ang){//, GLfloat c){
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (GLvoid*) 0);
 }
-
-
-
-
-
-
-
-

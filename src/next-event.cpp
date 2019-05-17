@@ -3,9 +3,7 @@
 
 void Poly::nextCollisions(std::vector<Collision>& currentCollisions){
 	currentCollisions.clear();
-
 	checkPolyCollisions( currentCollisions );
-	
 	checkSwirlCollision( currentCollisions );
 	
 }
@@ -13,45 +11,17 @@ void Poly::nextCollisions(std::vector<Collision>& currentCollisions){
 
 void Poly::checkPolyCollisions(std::vector<Collision>& currentCollisions){
 	Collision c;
-	bool flag = false;
 	for(int i=0; i<sides; i++){
 		c = nextPolyCollision(i);
 		if(c.getTime()==-1) continue;
-	
 		c.hit_vertex=i;
-		if(addCollision(currentCollisions, c)){
-			flag = true;
-		}
+		addCollision(currentCollisions, c);
 	}
-	if(!flag){
-	//	std::cout<<"Problem"<<std::endl;
-		
-	}
-}
-
-
-double fact(int a){
-  
-  int prod = 1;
-  for(int i=1; i<=a; i++){
-    prod *= i;
-  }
-  std::cout<<"Fact of "<<a<<" is "<<prod<<std::endl;
-  return prod;
-}
-
-
-double Poly::experimental_getTimeOfCollision(int a){
-  return 0.0;
 }
 
 
 Collision Poly::nextPolyCollision(int a){
   
-  // double time = experimental_getTimeOfCollision(a);
-  // return Collision(time, POLY_WITH_WALL);
-  
-	
 	double first_time = 1e-1; //Naive approach for now - start with guess at zero
 	int iterations = 0;
 	double f_time = newton_f(first_time, a);

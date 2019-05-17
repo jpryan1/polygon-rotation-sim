@@ -1,4 +1,3 @@
-
 #include "animation.h"
 #include <thread>
 #include <iostream>
@@ -8,20 +7,17 @@
 #include <ctime>
 
 #define DEFAULT_NUM_OF_ITERATIONS 5000000.0
-#define DEFAULT_SIDES 20
-#define DEFAULT_RADIUS 8.4
+#define DEFAULT_SIDES 6
+#define DEFAULT_RADIUS 8
 #define DEFAULT_E 1
 #define DEFAULT_DELTA_T 1e-6
+
 void simulation(int, double, double, int, int);
-void processHitVertices(std::vector<int>&, int);
 
 
 int main(int argc, char** argv){
 	
-	
 	std::cout.precision(16);
-	
-
 
 	int sides = DEFAULT_SIDES;
 	int iterations = DEFAULT_NUM_OF_ITERATIONS;
@@ -31,6 +27,7 @@ int main(int argc, char** argv){
 	double delta_t = DEFAULT_DELTA_T;
 	int c;
 	int showForceVec = 0;
+	
 	while ((c = getopt (argc, argv, "s:i:r:e:afd:h")) != -1) {
 		switch (c)
 		{
@@ -65,27 +62,13 @@ int main(int argc, char** argv){
 
 	printf("Simulating with radius %f, coefficient of restitution %f, \
 		%d sides, %d iterations\n", radius, coef, sides, iterations);
-	/*
-	 
-	 We accept one of two options. 'r' means just run the simulation on NUM_OF_Poly Poly,
-	 and output the average angular velocity.
-	 'a' is the same, but with an animation included
-	 
-	 */
-	
-	
-	
 	
 	if(!animate){
-		
 		Poly::animation =NULL;
 		simulation(sides, radius, coef, iterations, showForceVec);
 		return 0;
-		
 	}
-	
 	else{
-		
 		Animation animation(delta_t, radius, sides);
 		animation.setup();
 		Poly::animation = &animation;
@@ -97,11 +80,8 @@ int main(int argc, char** argv){
 		//Wait for the simulation to finish
 		drawer.join();
 		return 0;
-		
 	}
 }
-
-
 
 
 void simulation(int sides, double radius, double coef, int max_iterations, int showForceVec){
@@ -120,55 +100,15 @@ void simulation(int sides, double radius, double coef, int max_iterations, int s
 		poly.nextCollisions(currentCollisions);
 		poly.updatePositions(currentCollisions[0].getTime());
 		total_time +=currentCollisions[0].getTime();
-    // if(total_time >next_energy_update){
-    //   std::cout<<total_time<<","<<poly.getEnergyInBFrame()<<std::endl;
-    //   next_energy_update += 2.0;
-    // }
-    if(iterations > 50000 && iterations%1000 == 0){
-      angvels.push_back(poly.getAngVel());
-    }
-		
+
 		for(int i=0; i<currentCollisions.size(); i++){
 			poly.processCollision(currentCollisions[i]);
 		}
-		
 		if(currentCollisions[0].getType() == SWIRL){
 			poly.updateAnimation(currentCollisions[0].getTime(), -1);
 		}
 		else{
 			poly.updateAnimation(currentCollisions[0].getTime(), currentCollisions[0].hit_vertex);
 		}
-		
 	}
-
-
-  double mean = 0;
-  for(double angvel : angvels){
-    mean += angvel;
-  }mean /= angvels.size();
-  std::cout<<"Mean angvel: "<<mean<<std::endl;
-    double variance = 0;
-  for(double angvel : angvels){
-    variance += pow((angvel - mean),2);
-  }variance /= angvels.size();
-  std::cout<<"Stddev: "<<sqrt(variance)<<std::endl;
-
-}
-
-
-void processHitVertices(std::vector<int>& vert_dists, int size){
-	double total = 0;
-	for(int i=0; i<size; i++){
-		total += vert_dists[i];
-	}
-	double mean = total/size;
-	std::cout<<mean<<std::endl;
-
-	double dev = 0;
-	for(int i=0; i<size; i++){
-		dev += pow(vert_dists[i]-mean,2);
-	}
-	dev /= size;
-	dev = sqrt(dev);
-	std::cout<<dev<<std::endl;
 }

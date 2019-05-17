@@ -18,7 +18,6 @@ public:
 	
 	std::vector<GLushort> indices;
 	
-
 	static GLuint modelLoc;
 	Polygon(){}
 	Polygon(double r, int sides);

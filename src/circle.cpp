@@ -35,11 +35,3 @@ void Circle::draw(GLfloat a, GLfloat b, GLfloat c, double r){//, GLfloat c){
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (GLvoid*) 0);
 }
-
-
-
-
-
-
-
-
