@@ -15,7 +15,6 @@
 
 class Collision;
 
-
 class Poly{
 	
 	public:
@@ -24,7 +23,7 @@ class Poly{
 		static double boundrad;
 		static double swirl_angle;
 	
-	static Animation* animation;
+	  static Animation* animation;
 	
 		Poly(int s, double r, double c){
 			sides = s;
@@ -33,9 +32,9 @@ class Poly{
 			total_torque = 0;
 			error = 0;
 			showForceVec = 0;
-		 	mass = (0.5)*sides*radius*radius*sin(2*M_PI/sides);
-			moment_of_inertia = 
-				(0.5)*mass*radius*radius*(1-(2.0/3.0)*pow(sin(M_PI/sides),2));
+		 	mass = (0.5) * sides * radius * radius * sin(2*M_PI/sides);
+			moment_of_inertia =
+				 (0.5)*mass*radius*radius*(1-(2.0/3.0)*pow(sin(M_PI/sides),2));
 
 		}
 		~Poly(){
@@ -44,32 +43,35 @@ class Poly{
 	
 		void initialize();
 		void updatePositions(double collisionTime);
-	void updateAnimation(double time, int hit_vertex);
-
+	  void updateAnimation(double time, int hit_vertex);
 		void draw();
 		void nextCollisions(std::vector<Collision>& currentCollisions);
-	
-	vec vert_pos(int a);
-	double getAngVel();
-	
+		
+  	vec vert_pos(int a);
+  	double getAngVel();
+  	
 		Collision nextPolyCollision(int a);
-	
-	double newton_f(double t, int a);
-	double newton_fd(double t, int a);
+		double experimental_getTimeOfCollision(int a);
+
+  	double newton_f(double t, int a);
+  	double newton_fd(double t, int a);
 	
 		void checkPolyCollisions( std::vector<Collision>& currentCollisions );
 		void checkSwirlCollision( std::vector<Collision>& currentCollisions );
 
 		bool addCollision(std::vector<Collision>& currentCollisions, Collision& collision);
 
-	
-	void processCollision(Collision& collision);
-	void processPolyCollision(Collision& collision);
-	void processBwWCollision(Collision& collision);
+	  double getEnergyInLabFrame();
+	  double getEnergyInBFrame();
+	  double getEnergyInMFrame();
+  	void processCollision(Collision& collision);
+  	void processPolyCollision(Collision& collision);
+  	void processBwWCollision(Collision& collision);
 		void swirl();
 	
-	double error;
-	int showForceVec;
+  	double error;
+  	int showForceVec;
+  	
 	private:
 		int sides;
 

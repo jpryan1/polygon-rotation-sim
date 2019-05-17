@@ -132,7 +132,7 @@ void Animation::generateBuffers(){
 	glGenBuffers(1, &s_EBO);
 	glGenVertexArrays(1, &b_VAO);
 	glGenBuffers(1, &b_VBO);
-	glGenBuffers(1, &b_EBO);	
+	glGenBuffers(1, &b_EBO);
 	glGenVertexArrays(1, &f_VAO);
 	glGenBuffers(1, &f_VBO);
 	glGenBuffers(1, &f_EBO);
@@ -330,7 +330,7 @@ void Animation::drawShapes(){
 
 
 
-void Animation::setPoly(double* pp, double* pv, double pa, 
+void Animation::setPoly(double* pp, double* pv, double pa,
 						double pav, double* b, double* v, double* v_pos){
 	lock.lock();
 	polyang = pa;

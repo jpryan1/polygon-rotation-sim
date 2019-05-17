@@ -7,11 +7,11 @@
 #include "Collision.h"
 #include <ctime>
 
-#define DEFAULT_NUM_OF_ITERATIONS 400000.0
-#define DEFAULT_SIDES 8
-#define DEFAULT_RADIUS 7.5
-#define DEFAULT_E 0.8
-#define DEFAULT_DELTA_T 1e-7
+#define DEFAULT_NUM_OF_ITERATIONS 5000000.0
+#define DEFAULT_SIDES 20
+#define DEFAULT_RADIUS 8.4
+#define DEFAULT_E 1
+#define DEFAULT_DELTA_T 1e-6
 void simulation(int, double, double, int, int);
 void processHitVertices(std::vector<int>&, int);
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
 			showForceVec = 1;
 			break;
 		case 'h':
-			printf("IE-Solver 0.1a\nOptions: erisa ");
+			printf("PolySim\nOptions: erisa ");
 			return 0;
 		default:
 			abort ();
@@ -113,49 +113,49 @@ void simulation(int sides, double radius, double coef, int max_iterations, int s
 	
 	double total_time=0;
 	double total_ang_vel=0;
-
-	std::vector<int> vert_dists(100000);
-
-	int last_hit_vert = 0;
-	int vert_dists_size=0;
-	for(int iterations = 0; iterations<max_iterations; iterations++){
+	
+  std::vector<double> angvels;
+  for(int iterations = 0; iterations<max_iterations; iterations++){
 		
 		poly.nextCollisions(currentCollisions);
 		poly.updatePositions(currentCollisions[0].getTime());
 		total_time +=currentCollisions[0].getTime();
-		std::cout<<poly.getAngVel()<<std::endl;
+    // if(total_time >next_energy_update){
+    //   std::cout<<total_time<<","<<poly.getEnergyInBFrame()<<std::endl;
+    //   next_energy_update += 2.0;
+    // }
+    if(iterations > 50000 && iterations%1000 == 0){
+      angvels.push_back(poly.getAngVel());
+    }
 		
-		if(iterations>300000){
-			total_ang_vel += poly.getAngVel();
-			if(currentCollisions[0].getType() != SWIRL){
-				int current_hit_vert = currentCollisions[0].hit_vertex;
-				int lower = std::min(last_hit_vert, current_hit_vert);
-				int higher = std::max(last_hit_vert, current_hit_vert);
-				int dist = std::min(higher-lower, lower-higher+sides);
-				vert_dists[vert_dists_size] = dist;
-				vert_dists_size++;
-				last_hit_vert = current_hit_vert;
-			}
-		}
-
-
 		for(int i=0; i<currentCollisions.size(); i++){
 			poly.processCollision(currentCollisions[i]);
 		}
-		//if(iterations<300000) continue;
+		
 		if(currentCollisions[0].getType() == SWIRL){
 			poly.updateAnimation(currentCollisions[0].getTime(), -1);
 		}
 		else{
 			poly.updateAnimation(currentCollisions[0].getTime(), currentCollisions[0].hit_vertex);
-		
 		}
+		
 	}
-	//processHitVertices(vert_dists, vert_dists_size);
-	std::cout<< "AngVel: "<<(total_ang_vel/(max_iterations-300000))<<std::endl;
-	//printf("Error %f\n", poly.error);
-	
+
+
+  double mean = 0;
+  for(double angvel : angvels){
+    mean += angvel;
+  }mean /= angvels.size();
+  std::cout<<"Mean angvel: "<<mean<<std::endl;
+    double variance = 0;
+  for(double angvel : angvels){
+    variance += pow((angvel - mean),2);
+  }variance /= angvels.size();
+  std::cout<<"Stddev: "<<sqrt(variance)<<std::endl;
+
 }
+
+
 void processHitVertices(std::vector<int>& vert_dists, int size){
 	double total = 0;
 	for(int i=0; i<size; i++){
@@ -171,15 +171,4 @@ void processHitVertices(std::vector<int>& vert_dists, int size){
 	dev /= size;
 	dev = sqrt(dev);
 	std::cout<<dev<<std::endl;
-
-
 }
-
-
-
-
-
-
-
-
-
