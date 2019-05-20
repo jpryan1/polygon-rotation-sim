@@ -5,7 +5,12 @@ void Poly::nextCollisions(std::vector<Collision>& currentCollisions){
 	currentCollisions.clear();
 	checkPolyCollisions( currentCollisions );
 	checkSwirlCollision( currentCollisions );
-	
+// 		if(currentCollisions[0].getType()==POLY_WITH_WALL){
+		  
+// 	  std::cout<<"yup, vert collision next"<<std::endl;
+// 	}else{
+// 	  std::cout<<"nope, Swirl in "<<currentCollisions[0].getTime()<<std::endl;
+// 	}
 }
 
 
@@ -15,8 +20,13 @@ void Poly::checkPolyCollisions(std::vector<Collision>& currentCollisions){
 		c = nextPolyCollision(i);
 		if(c.getTime()==-1) continue;
 		c.hit_vertex=i;
+		// std::cout<<"Adding col w/ grad "<<newton_fd(c.getTime(), i)<<std::endl;
 		addCollision(currentCollisions, c);
 	}
+// 	if(currentCollisions.size()>0){
+// 	  std::cout<<currentCollisions[0].hit_vertex<<" colliding in "<<currentCollisions[0].getTime()<<std::endl;
+// 	}
+	
 }
 
 
@@ -26,36 +36,30 @@ Collision Poly::nextPolyCollision(int a){
 	int iterations = 0;
 	double f_time = newton_f(first_time, a);
 	
-  if(fabs(f_time)<1e-13){
-    	return Collision(-1, POLY_WITH_WALL);
-  }
-  
 	while( fabs(f_time) > 1e-13 && iterations++ < 100){
 		
 		double deriv = newton_fd(first_time, a);
 		
-		if(fabs(deriv)<1e-14){
+		if(fabs(deriv)<1e-12){
 			break;
 		}
 		
+		double step_time = first_time;
+	  
 		first_time = first_time - (f_time/deriv);
 		
 		f_time = newton_f(first_time, a);
 		
 	}
-	if(fabs( f_time) >1e-12 || first_time<=1e-10 ){
 
+	if(fabs( f_time) >1e-8 || first_time<=1e-10){
 		first_time = -1;
 	}
 	
-	
 	double second_time = 1e-2; //Naive approach for now - start with guess at zero
-	 iterations = 0;
-	 f_time = newton_f(second_time, a);
-	
-  if(fabs(f_time)<1e-13){
-    	return Collision(-1, POLY_WITH_WALL);
-  }
+	iterations = 0;
+
+	f_time = newton_f(second_time, a);
   
 	while( fabs(f_time) > 1e-13 && iterations++ < 100){
 		
@@ -70,18 +74,18 @@ Collision Poly::nextPolyCollision(int a){
 		f_time = newton_f(second_time, a);
 		
 	}
-	if(fabs( f_time) >1e-12 || second_time<=1e-10 ){
 
+	if(fabs( f_time) >1e-8 || second_time<=1e-10 ){
 		second_time = -1;
-	}
-	
-	
+  }
+
 	if(first_time==-1){
 	  return Collision(second_time, POLY_WITH_WALL);
 	}
 	else if(second_time == -1){
 	  return Collision(first_time, POLY_WITH_WALL);
-	}else{
+	}
+	else{
 	  return Collision(std::min(first_time,second_time), POLY_WITH_WALL);
 	}
 	
@@ -89,6 +93,7 @@ Collision Poly::nextPolyCollision(int a){
 
 
 double Poly::newton_f(double t, int a){
+  
 	double f = 0;
 	double A = centerpos[0] - boundpos[0];
 	double B = centerpos[1] - boundpos[1];

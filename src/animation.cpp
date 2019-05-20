@@ -304,7 +304,7 @@ void Animation::drawShapes(){
 	glUniform4f(colorLoc, 0.8f, 0.8f, 0.8f, 1.0f);
 	circle.draw(boundpos[0], boundpos[1],0, 8.6);
 
-	circle.draw(boundpos[0], boundpos[1],0.1, 0.25);
+	circle.draw(0,0,0.1,0.25);//boundpos[0], boundpos[1],0.1, 0.25);
 	glUniform4f(colorLoc, 0.2f, 0.8f, 0.3f, 1.0f);
 	//center circle
 	circle.draw(polypos[0], polypos[1], 0.1, 0.25);
@@ -329,14 +329,9 @@ void Animation::setPoly(double* pp, double* pv, double pa,
 		boundpos[i] = b[i];
 		boundvel[i] = v[i];
 	}
+	
 	lock.unlock();
 	if(v_pos){
-
-		if(dif>0){
-			//std::cout<<"Change in angvel is Positive"<<std::endl;
-		}else{
-			//std::cout<<"Change in angvel is Negative"<<std::endl;
-		}
 		forceVecAng = atan2(v_pos[1],v_pos[0]);
 		drawForceVec = true;
 		sleep(2);
@@ -349,11 +344,11 @@ void Animation::movePoly(double time){
 	double start = 0;
 	while(start<time){
 		lock.lock();
-		for(int j=0; j<2; j++){
-			polypos[j] += delta_t*polyvel[j];
-		}
-		polyang += delta_t*polyangvel;
-		for(int j=0; j<2; j++) boundpos[j] += delta_t*boundvel[j];
+		// for(int j=0; j<2; j++){
+		// 	polypos[j] += delta_t*polyvel[j];
+		// }
+		// polyang += delta_t*polyangvel;
+		// for(int j=0; j<2; j++) boundpos[j] += delta_t*boundvel[j];
 		lock.unlock();
 		start+= delta_t;
 	}

@@ -6,13 +6,13 @@
 #include "Collision.h"
 #include <ctime>
 
-#define DEFAULT_NUM_OF_ITERATIONS 5000000.0
-#define DEFAULT_SIDES 6
+#define DEFAULT_NUM_OF_ITERATIONS 2000000.0
+#define DEFAULT_SIDES 8
 #define DEFAULT_RADIUS 8
 #define DEFAULT_E 1
 #define DEFAULT_DELTA_T 1e-6
 
-void simulation(int, double, double, int, int);
+void simulation(int, double, double, int, bool);
 
 
 int main(int argc, char** argv){
@@ -27,8 +27,9 @@ int main(int argc, char** argv){
 	double delta_t = DEFAULT_DELTA_T;
 	int c;
 	int showForceVec = 0;
+	bool m_frame = false;
 	
-	while ((c = getopt (argc, argv, "s:i:r:e:afd:h")) != -1) {
+	while ((c = getopt (argc, argv, "s:i:r:e:amfd:h")) != -1) {
 		switch (c)
 		{
 		case 's':
@@ -46,6 +47,9 @@ int main(int argc, char** argv){
 		case 'a':
 			animate = 1;
 			break;
+		case 'm':
+		  m_frame = true;
+		  break;
 		case 'd':
 			delta_t = std::strtod(optarg, NULL);
 			break;
@@ -60,12 +64,13 @@ int main(int argc, char** argv){
 		}
 	}
 
-	printf("Simulating with radius %f, coefficient of restitution %f, \
+// 	printf("Simulating with radius %f, coefficient of restitution %f, \
 		%d sides, %d iterations\n", radius, coef, sides, iterations);
 	
+
 	if(!animate){
 		Poly::animation =NULL;
-		simulation(sides, radius, coef, iterations, showForceVec);
+		simulation(sides, radius, coef, iterations, false);
 		return 0;
 	}
 	else{
@@ -74,7 +79,7 @@ int main(int argc, char** argv){
 		Poly::animation = &animation;
 
 		//Set the simulation running
-		std::thread drawer(simulation, sides, radius, coef, iterations, showForceVec);
+		std::thread drawer(simulation, sides, radius, coef, iterations, m_frame);
 		//Begin the animation
 		animation.draw();
 		//Wait for the simulation to finish
@@ -84,19 +89,21 @@ int main(int argc, char** argv){
 }
 
 
-void simulation(int sides, double radius, double coef, int max_iterations, int showForceVec){
+void simulation(int sides, double radius, double coef, int max_iterations, bool m_frame){
 	
 	std::vector<Collision> currentCollisions;
 	Poly poly(sides, radius, coef);
 	poly.initialize();
-	poly.showForceVec = showForceVec;
+	poly.m_frame = m_frame;
 	
 	double total_time=0;
 	double total_ang_vel=0;
-	
+
   std::vector<double> angvels;
+  
   for(int iterations = 0; iterations<max_iterations; iterations++){
-		
+		  
+    
 		poly.nextCollisions(currentCollisions);
 		poly.updatePositions(currentCollisions[0].getTime());
 		total_time +=currentCollisions[0].getTime();
@@ -104,11 +111,23 @@ void simulation(int sides, double radius, double coef, int max_iterations, int s
 		for(int i=0; i<currentCollisions.size(); i++){
 			poly.processCollision(currentCollisions[i]);
 		}
-		if(currentCollisions[0].getType() == SWIRL){
-			poly.updateAnimation(currentCollisions[0].getTime(), -1);
-		}
-		else{
-			poly.updateAnimation(currentCollisions[0].getTime(), currentCollisions[0].hit_vertex);
-		}
+		poly.updateAnimation(currentCollisions[0].getTime(), -1);
+    angvels.push_back(poly.getAngVel());
 	}
+	
+	double mean = 0;
+  for(int i=0; i<100000; i++){
+	  mean += angvels[i];
+	}
+	std::cout<<mean/100000.0<<std::endl;
+	for(int i=100000; i < angvels.size(); i++){
+	  mean -= angvels[i-100000];
+	  mean += angvels[i];
+	  if(i%100==0){
+	    
+	  
+	  std::cout<<mean/100000.0<<std::endl;
+	  }
+	    
+	 }
 }

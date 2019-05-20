@@ -58,7 +58,7 @@ class Poly{
   	void updateAnimation(double time, int hit_vertex);
 		void draw();
   	
-  	
+  	bool m_frame = false;
 	private:
 		int sides;
 
@@ -71,6 +71,7 @@ class Poly{
 		double boundvel[2];
 	
 		double swirl_time;
+		double total_time = 0.0;
 };
 
 
