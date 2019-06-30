@@ -1,9 +1,5 @@
 #include "Poly.h"
 
-double Poly::swirl_interval = 0.025;
-double Poly::boundrad = 8.6;
-double Poly::swirl_angle = 3.14159265359 / 240;
-
 Animation* Poly::animation;
 
 
@@ -20,22 +16,42 @@ Poly::Poly(int s, double r, double c){
 		
 		
 void Poly::initialize(){
+	for(int i=0; i<NUM_BINS; i++){
+	  counts[i] = 0;
+	  difs[i] = 0.0;
+	}
 	
-	this->boundpos[0] = 0;
-	this->boundpos[1] = 0;
-	this->boundvel[0] = 1;
+	this->boundvel[0] = AMPLITUDE_PARAMETER;
 	this->boundvel[1] = 0;
 	this->swirl_time=0;
+	this->swirl_counter = TIMESTEPS_PER_SIDE / 2.0;
+	
+	// Start at halfway through the first side
+	this->boundpos[0] =  (TIMESTEPS_PER_SIDE*TIMESTEP_INTERVAL/2.0) * this->boundvel[0];
+	this->boundpos[1] =0;
+	
+	
+	
 	for(int i=0; i<2; i++){
-		centerpos[i] = 0;
-		centervel[i] = 0.6;
+		centerpos[i] = boundpos[i];
 	}
+  srand((unsigned)time(NULL));
+  double X = ((double) rand() / (double) RAND_MAX);
 
+  double rand_ang = X * 2*M_PI ;
+  centervel[0] = cos(rand_ang);
+  centervel[1] = sin(rand_ang);
+  
 	this->ang = 0;
 	this->angvel = 0.0;
 	
 	if(animation){
-		animation->setPoly(centerpos, centervel, ang, angvel, boundpos, boundvel, NULL);
+	  double traj_pos[2];
+	  //Doesn't really matter at t=0
+	  traj_pos[0] = 0;
+	  traj_pos[1] = 0;
+	  
+		animation->setPoly(centerpos, centervel, ang, angvel, boundpos, boundvel, NULL,0, traj_pos);
 		animation->notReady = false;
 	}
 }
@@ -58,18 +74,19 @@ double Poly::getEnergyInLabFrame(){
 
 
 double Poly::getEnergyInMFrame(){
-  // So, the boundary traj starts at 0,0, has side length swirl_interval, and
-  // has 2pi/swirl_angle sides. its center is at an angle swirl_angle/2 from origin
+  // So, the boundary traj starts at 0,0, has side length TIMESTEP_INTERVAL, and
+  // has 2pi/SWIRL_ANGLE sides. its center is at an angle SWIRL_ANGLE/2 from origin
   //, distance traj_radius/2 away, traj_radius =
-  double n = 2*M_PI/swirl_angle;
-  double traj_radius = (swirl_interval)/(2*sin(M_PI/n));
-  double traj_cx = traj_radius*cos(swirl_angle/2.0);
-  double traj_cy = traj_radius*sin(swirl_angle/2.0);
+ 
+  double n = 2 * M_PI/SWIRL_ANGLE;
+  double traj_radius = (TIMESTEP_INTERVAL)/(2*sin(M_PI/n));
+  double traj_cx = traj_radius*cos(SWIRL_ANGLE/2.0);
+  double traj_cy = traj_radius*sin(SWIRL_ANGLE/2.0);
 
   double rx = centerpos[0] - traj_cx;
   double ry = centerpos[1] - traj_cy;
   
-  double period = swirl_interval*n;
+  double period = TIMESTEP_INTERVAL*n;
   double omega = 2*M_PI/period;
   double crossx = -omega*ry;
   double crossy = omega*rx;

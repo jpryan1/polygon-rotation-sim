@@ -1,0 +1,7 @@
+Simulating with radius 7.300000, coefficient of restitution 0.900000, 		6 sides, 13 num swirls
+Neg v_rel
+Error: impacting vertex approaching from outside polygon.
+Here is my guess - you are using CoR<1 and your system lost all its energy
+This is an event driven simulation, which will NOT accept a polygon "sitting" on the wall
+Check the animation to see if it is snaking. Here are the angular velocities:
+Boundary: 0.5235987755982988 Polygon: -0.1118460154838423

@@ -11,16 +11,22 @@
 #include "animation.h"
 #include "Collision.h"
 
+#define NUM_BINS 25
+#define NUM_SIDES_BOUNDARY_TRAJECTORY 5
+#define TIMESTEP_INTERVAL 0.025
+#define BOUNDARY_RADIUS 8.6
+#define BOUNDARY_PERIOD 12.0
+#define AMPLITUDE_PARAMETER 1.0
+
+
+#define SWIRL_ANGLE (2*M_PI/NUM_SIDES_BOUNDARY_TRAJECTORY)
+#define TIMESTEPS_PER_SIDE BOUNDARY_PERIOD/(TIMESTEP_INTERVAL*NUM_SIDES_BOUNDARY_TRAJECTORY)
 
 class Collision;
 
 class Poly{
 	
 	public:
-	
-		static double swirl_interval;
-		static double boundrad;
-		static double swirl_angle;
 	
 	  static Animation* animation;
 	
@@ -55,10 +61,13 @@ class Poly{
   	double error;
   	
   	int showForceVec;
-  	void updateAnimation(double time, int hit_vertex);
+  	void updateAnimation(int hit_vertex);
 		void draw();
   	
-  	bool m_frame = false;
+  	bool show_m_frame = false;
+  	int counts[NUM_BINS];
+  	double difs[NUM_BINS];
+  	int swirl_counter = 0;
 	private:
 		int sides;
 

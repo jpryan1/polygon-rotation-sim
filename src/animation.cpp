@@ -224,7 +224,7 @@ void Animation::setProjectionMatrices(){
 	glm::mat4 projection;
 	
 	//View is at z = +8
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -30.0f));
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -40.0f));
 //	view = glm::rotate(view, (float) -(M_PI/8.0), glm::vec3(0.0f, 1.0f, 0.0f));
 	//Projection has 45 degree FoV, aspect ratio given by the window's, and
 	//records only those objects within 0.1f and 100.0f of the "camera"
@@ -291,23 +291,34 @@ void Animation::drawShapes(){
 		glBindVertexArray(0);
 	}
 
+  //POLYGON
 	glBindVertexArray(s_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
 	glUniform4f(colorLoc, 0.35f, 0.5f, 0.75f, 1.0f);
 	polygon.draw(polypos[0], polypos[1], 0, polyang);
-	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	
+	// END POLYGON
+
+  // BOUNDARY
 	glBindVertexArray(b_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, b_VBO);
 	glUniform4f(colorLoc, 0.8f, 0.8f, 0.8f, 1.0f);
 	circle.draw(boundpos[0], boundpos[1],0, 8.6);
-
-	circle.draw(0,0,0.1,0.25);//boundpos[0], boundpos[1],0.1, 0.25);
+	
 	glUniform4f(colorLoc, 0.2f, 0.8f, 0.3f, 1.0f);
-	//center circle
+	// M-ball
+	circle.draw(boundpos[0] + 8.6*cos(m_ang),boundpos[1]+8.6*sin(m_ang),0.1,1);
+	
+	glUniform4f(colorLoc, 0.2f, 0.2f, 0.3f, 1.0f);
+	//Center circle
 	circle.draw(polypos[0], polypos[1], 0.1, 0.25);
+	
+	
+	glUniform4f(colorLoc, 1.0f, 0.7f, 0.3f, 1.0f);
+	//Center of trajectory
+	
+	circle.draw(traj_pos[0], traj_pos[1], 0.1, 0.25);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
@@ -317,7 +328,7 @@ void Animation::drawShapes(){
 
 
 void Animation::setPoly(double* pp, double* pv, double pa,
-						double pav, double* b, double* v, double* v_pos){
+						double pav, double* b, double* v, double* v_pos, double m_ang_, double* traj_c){
 	lock.lock();
 	polyang = pa;
 	double dif = pav - polyangvel;
@@ -329,6 +340,9 @@ void Animation::setPoly(double* pp, double* pv, double pa,
 		boundpos[i] = b[i];
 		boundvel[i] = v[i];
 	}
+	m_ang = m_ang_;
+	traj_pos[0] = traj_c[0];
+	traj_pos[1] = traj_c[1];
 	
 	lock.unlock();
 	if(v_pos){
@@ -337,6 +351,7 @@ void Animation::setPoly(double* pp, double* pv, double pa,
 		sleep(2);
 		drawForceVec = false;
 	}
+	
 }
 
 

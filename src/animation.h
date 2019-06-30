@@ -24,7 +24,7 @@ class Animation{
 		void draw();
 		void drawShapes();
 		void setPoly(double* pp, double* pv, double pa, double pav,
-					 double* b, double* v, double* v_pos);
+					 double* b, double* v, double* v_pos, double m_ang, double* traj_c);
 		void movePoly(double time);
 		std::atomic<bool> notReady;
   	std::atomic<bool> drawing;
@@ -46,6 +46,9 @@ class Animation{
   	double polyangvel;
   	double boundpos[2];
   	double boundvel[2];
+  	double m_ang=0;
+  	
+  	double traj_pos[2];
   
   	double delta_t, radius;
   	int sides;
